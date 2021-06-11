@@ -6,8 +6,10 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "base64-arraybuffer": "^0.2.0",
     "react": "^17.0.0",
-    "react-dom": "^17.0.0"
+    "react-dom": "^17.0.0",
+    "react-use": "^17.2.4"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",
