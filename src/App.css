@@ -1,0 +1,28 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  font-family: sans-serif;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  padding: 0.25em;
+}
+
+.controls > * {
+  flex: 1;
+  padding: 0.25em;
+}
+
+.display {
+  padding: 1em;
+  text-align: center;
+}
+
+.display canvas {
+  display: block;
+  margin: auto;
+  margin-bottom: 0.5em;
+}

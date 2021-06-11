@@ -28,8 +28,9 @@ export default function useNessie(
     }
     const canvas = canvasRef.current;
     if (canvas) {
-      nessieRef.current = new Nessie(canvas, romArrayBuffer);
-      nessieRef.current.boot();
+      const nessie = new Nessie(canvas, romArrayBuffer);
+      nessie.boot();
+      nessieRef.current = nessie;
       stepFrame(0);
     }
   }, []);
