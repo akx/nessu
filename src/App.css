@@ -1,9 +1,19 @@
 * {
   box-sizing: border-box;
+  font-family: sans-serif;
+  font-size: 9pt;
+  color: #aaa;
 }
 body {
-  font-family: sans-serif;
   margin: 0;
+  background: #111;
+}
+
+button,
+input {
+  background: #444;
+  border: 1px solid currentColor;
+  display: block;
 }
 
 .controls {
@@ -25,4 +35,19 @@ body {
   display: block;
   margin: auto;
   margin-bottom: 0.5em;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.buttons > * {
+  flex: 1;
+  margin: 2px;
+}
+
+.corruption-info {
+  font-size: 80%;
+  text-align: center;
 }

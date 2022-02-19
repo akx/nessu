@@ -1,45 +1,73 @@
 import React from "react";
 import * as b64ab from "base64-arraybuffer";
 import useNessie from "./useNessie";
+import Rand, { PRNG } from "rand-seed";
+
 import "./App.css";
+
+type CorruptionInfo = Record<any, any>;
+
+function corruptArrayBuffer(
+  corruption: number,
+  seed: string,
+  arrayBuffer: ArrayBuffer
+): [ArrayBuffer, CorruptionInfo] {
+  const rand = new Rand(seed, PRNG.xoshiro128ss);
+  const info = { corruption, seed, xor: 0, add: 0 };
+  const newArrayBuffer = arrayBuffer.slice(0);
+  const uint8Array = new Uint8Array(newArrayBuffer);
+  for (let i = 0; i < uint8Array.length; i++) {
+    if (rand.next() < corruption) {
+      if (rand.next() < 0.2) {
+        uint8Array[i] ^= rand.next() * 256;
+        info.xor++;
+      } else {
+        uint8Array[i]++;
+        info.add++;
+      }
+    }
+  }
+  return [newArrayBuffer, info];
+}
+
+function generateSeed() {
+  return String(Math.floor(+new Date()));
+}
 
 function App() {
   const nesCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const arrayBufferRef = React.useRef<ArrayBuffer | null>(null);
   const [corruption, setCorruption] = React.useState(0.0005);
-  const [corruptionInfo, setCorruptionInfo] = React.useState<Record<any, any>>(
+  const [corruptionInfo, setCorruptionInfo] = React.useState<CorruptionInfo>(
     {}
   );
+  const [seed, setSeed] = React.useState(generateSeed);
   const { bootArrayBuffer } = useNessie(nesCanvasRef);
 
-  const corruptArrayBuffer = React.useCallback(
-    (arrayBuffer: ArrayBuffer): [ArrayBuffer, Record<any, any>] => {
-      const info = { corruption, xor: 0, add: 0 };
-      const newArrayBuffer = arrayBuffer.slice(0);
-      const uint8Array = new Uint8Array(newArrayBuffer);
-      for (let i = 0; i < uint8Array.length; i++) {
-        if (Math.random() < corruption) {
-          if (Math.random() < 0.2) {
-            uint8Array[i] ^= Math.random() * 256;
-            info.xor++;
-          } else {
-            uint8Array[i]++;
-            info.add++;
-          }
-        }
-      }
-      return [newArrayBuffer, info];
+  const restartNessie = React.useCallback(
+    (corruption: number, seed: string) => {
+      const arrayBuffer = arrayBufferRef.current;
+      if (!arrayBuffer) return;
+      const [newArrayBuffer, info] = corruptArrayBuffer(
+        corruption,
+        seed,
+        arrayBuffer
+      );
+      setCorruptionInfo(info);
+      bootArrayBuffer(newArrayBuffer);
     },
-    [corruption]
+    []
   );
 
-  const restartNessie = React.useCallback(() => {
-    const arrayBuffer = arrayBufferRef.current;
-    if (!arrayBuffer) return;
-    const [newArrayBuffer, info] = corruptArrayBuffer(arrayBuffer);
-    setCorruptionInfo(info);
-    bootArrayBuffer(newArrayBuffer);
-  }, [corruptArrayBuffer]);
+  const restartNessieWithCurrentSettings = React.useCallback(() => {
+    restartNessie(corruption, seed);
+  }, [corruption, seed]);
+
+  const reseedAndRestartNessie = React.useCallback(() => {
+    const newSeed = generateSeed();
+    setSeed(newSeed);
+    restartNessie(corruption, newSeed);
+  }, [corruption]);
 
   const handleLoad = React.useCallback(
     async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +76,7 @@ function App() {
       const romArrayBuffer = await file.arrayBuffer();
       localStorage.setItem("nessu-last-rom", b64ab.encode(romArrayBuffer));
       arrayBufferRef.current = romArrayBuffer;
-      restartNessie();
+      restartNessieWithCurrentSettings();
     },
     []
   );
@@ -57,7 +85,7 @@ function App() {
     const lastData = localStorage.getItem("nessu-last-rom");
     if (lastData) {
       arrayBufferRef.current = b64ab.decode(lastData);
-      restartNessie();
+      restartNessieWithCurrentSettings();
     }
   }, []);
 
@@ -69,7 +97,15 @@ function App() {
           <input type="file" onChange={handleLoad} />
         </div>
         <div>
-          Corruption factor:
+          Seed:
+          <input
+            type="text"
+            value={seed}
+            onChange={(e) => setSeed(e.target.value)}
+          />
+        </div>
+        <div>
+          Corruption factor: {(corruption * 100).toPrecision(2)}%
           <input
             type="range"
             min={0}
@@ -78,10 +114,14 @@ function App() {
             value={corruption}
             onChange={(e) => setCorruption(e.target.valueAsNumber)}
           />
-          {(corruption * 100).toPrecision(2)}%
         </div>
-        <div>{JSON.stringify(corruptionInfo)}</div>
-        <button onClick={restartNessie}>Restart</button>
+        <div className="buttons">
+          <button onClick={reseedAndRestartNessie}>Reseed & restart</button>
+          <button onClick={restartNessieWithCurrentSettings}>Restart</button>
+        </div>
+      </div>
+      <div className="corruption-info">
+        {JSON.stringify(corruptionInfo, null, 2)}
       </div>
       <div className="display">
         <canvas

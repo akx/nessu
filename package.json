@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "base64-arraybuffer": "^1.0.2",
+    "rand-seed": "^1.0.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-use": "^17.3.2"

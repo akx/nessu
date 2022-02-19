@@ -702,6 +702,11 @@ prettier@^2.5.1:
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.5.1.tgz#fff75fa9d519c54cf0fce328c1017d94546bc56a"
   integrity sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==
 
+rand-seed@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/rand-seed/-/rand-seed-1.0.1.tgz#f48c134890e0bc3725c5b6c99bc8a53fba8e0e9b"
+  integrity sha512-g7uUh6C01OTozmt/ZqmzY8dTPW06je4aEiVp/8Hv213vMySW4usQFMvNiaDp5Vw0i7oZYl0zpao2YuUvvSjIkA==
+
 react-dom@^17.0.0:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.2.tgz#ecffb6845e3ad8dbfcdc498f0d0a939736502c23"
