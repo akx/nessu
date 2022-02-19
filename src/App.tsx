@@ -37,7 +37,8 @@ function generateSeed() {
 function App() {
   const nesCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const arrayBufferRef = React.useRef<ArrayBuffer | null>(null);
-  const [corruption, setCorruption] = React.useState(0.0005);
+  const [rawCorruption, setRawCorruption] = React.useState(0.1);
+  const corruption = Math.pow(rawCorruption, 3) * 0.1;
   const [corruptionInfo, setCorruptionInfo] = React.useState<CorruptionInfo>(
     {}
   );
@@ -109,10 +110,10 @@ function App() {
           <input
             type="range"
             min={0}
-            max={0.1}
-            step={0.000001}
-            value={corruption}
-            onChange={(e) => setCorruption(e.target.valueAsNumber)}
+            max={1}
+            step={0.001}
+            value={rawCorruption}
+            onChange={(e) => setRawCorruption(e.target.valueAsNumber)}
           />
         </div>
         <div className="buttons">
