@@ -1,5 +1,5 @@
 import React from "react";
-import b64ab from "base64-arraybuffer";
+import * as b64ab from "base64-arraybuffer";
 import useNessie from "./useNessie";
 import "./App.css";
 
